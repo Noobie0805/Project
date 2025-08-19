@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import jwt from 'jasonwebtoken'; // padho net pe samajh aajayea inka use idhar
+import jwt from 'jsonwebtoken'; // padho net pe samajh aajayea inka use idhar
 import bcrypt from 'bcrypt';     // padho net pe samajh aajayea inka use idhar
 
 const userSchema = new Schema(
