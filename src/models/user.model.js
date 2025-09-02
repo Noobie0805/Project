@@ -61,7 +61,7 @@ userSchema.methods.passwordAuth = async function (password) {
 
 
 userSchema.methods.generateAccessToken = function () {
-    jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
             email: this.email,
@@ -69,16 +69,16 @@ userSchema.methods.generateAccessToken = function () {
             fullname: this.fullname
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY } // Access token expires in 15 minutes
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
     )
 }
 userSchema.methods.generateRefreshToken = function () {
-    jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
         },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY } // Access token expires in 15 minutes
+        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
     )
 }
 
