@@ -302,6 +302,74 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params; // params se username milta hai kyonki ye route me define kiya gaya hai
+
+    if (!username) {
+        throw new ApiError(400, "Username is required to find channel");
+    }
+
+    // AGGREGATION PIPELINE FOR USER CHANNEL PROFILE
+    const channel = await User.aggregate([
+        {
+            // Match the user by username
+            $match: {
+                username: username?.toLowerCase()
+            },
+        },
+        {
+            // to get subscriber lookup for documents where user is the channel
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "subscribers"
+            }
+        },
+        {
+            //To get the channels that the user is subscribed to lookup for the documents where user is the subscriber
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "subscribedTo"
+            }
+        },
+        {
+            // Add subscriber and subscribedTo counts to get the channel statistics
+            $addFields: {
+                subscribersCount: { $size: "$subscribers" }, // $ is used as its a field now
+                channelsSubscribedToCount: { $size: "$subscribedTo" }, // $ is used as its a field now
+                isSubscribed: {
+                    $cond: {
+                        $in: [req.user?._id, "$subscribers.subscriber"],
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            // Project the desired fields for the user channel profile means show desired fields only
+            $project: {
+                fullname: 1,
+                username: 1,
+                email: 1,
+                avatar: 1,
+                coverImage: 1,
+                subscribersCount: 1,
+                channelsSubscribedToCount: 1,
+                isSubscribed: 1
+            }
+        }
+    ]); // .aggregate([...]) apna ARRAY dega as an output kisme se kaam ki values milengi usem se apne kaam ka dhundna pdega..apne case me to 1 hi user hai to ek hi user ka profile milega
+
+    if (!channel?.length) {
+        throw new ApiError(404, "Channel does not exist");
+    }
+
+    return res.status(200).json(new ApiResponse(200, channel[0], "User channel profile fetched successfully"));
+});
 
 
 export {
@@ -313,6 +381,7 @@ export {
     getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    getUserChannelProfile
 };
 
