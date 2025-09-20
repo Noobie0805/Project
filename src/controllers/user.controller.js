@@ -3,7 +3,7 @@ import { ApiError } from '../utils/apiError.js';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/apiResponse.js';
-import jwt from 'jsonwebtoken'; ``
+import jwt from 'jsonwebtoken';
 
 //helper functions
 const generateAccessTokenRefreshToken = async (userId) => {
@@ -15,7 +15,7 @@ const generateAccessTokenRefreshToken = async (userId) => {
         const refreshToken = user.generateRefreshToken();
         //save refresh token on database
         user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false }); // here password is required parameter in  model but we are only updating refresh token so used {validateBeforeSave:false}
+        await user.save({ validateBeforeSave: false }); // here password is required parameter in model but we are only updating refresh token so used {validateBeforeSave:false}
         //return them
         return { accessToken, refreshToken };
     }
@@ -70,7 +70,7 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         username: username.toLowerCase()
-    })
+    });
 
     //   STEP-7   >>>>  # Remove password and refresh token field from response
     const createdUser = await User.findById(user._id).select(
@@ -95,7 +95,6 @@ const userlogin = asyncHandler(async (req, res) => {
     if (!email && !username) {
         throw new ApiError(400, "Username or email is required");
     }
-
     //find if the user exists in the database
     const findUser = await User.findOne({ $or: [{ email }, { username }] });
     if (!findUser) {
@@ -115,7 +114,6 @@ const userlogin = asyncHandler(async (req, res) => {
     const loggedInUser = await User.findById(findUser._id).select("-password -refreshToken");
 
     //return response
-
     const options = {
         httpOnly: true,
         secure: true

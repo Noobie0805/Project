@@ -32,7 +32,7 @@ router.route("/current-user").get(verifyJWT, getCurrentUser);  //.get is used as
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);  //.patch is used as we are updating few fields of the user and not the entire user
 router.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router.route("/cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
-router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+router.route("username").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
 
 export default router;
